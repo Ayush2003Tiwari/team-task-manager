@@ -18,7 +18,7 @@ function Projects() {
       };
 
       const { data } = await axios.get(
-        "http://https://team-task-manager-production-f2ec.up.railway.app/api/projects",
+        "https://team-task-manager-production-f2ec.up.railway.app/api/projects",
         config
       );
 
@@ -37,7 +37,7 @@ function Projects() {
       };
 
       await axios.post(
-        "http://https://team-task-manager-production-f2ec.up.railway.app/api/projects",
+        "https://team-task-manager-production-f2ec.up.railway.app/api/projects",
         {
           name,
           description,
@@ -51,6 +51,7 @@ function Projects() {
       setDescription("");
     } catch (error) {
       console.log(error);
+      alert("Project Creation Failed");
     }
   };
 
@@ -66,18 +67,14 @@ function Projects() {
         <h1 className="mb-4">Projects</h1>
 
         <div className="card p-4 mb-4">
-          <h3 className="mb-3">
-            Create Project
-          </h3>
+          <h3 className="mb-3">Create Project</h3>
 
           <input
             type="text"
             className="form-control mb-3"
             placeholder="Enter Project Name"
             value={name}
-            onChange={(e) =>
-              setName(e.target.value)
-            }
+            onChange={(e) => setName(e.target.value)}
           />
 
           <input
@@ -100,16 +97,20 @@ function Projects() {
 
         <h2 className="mb-3">All Projects</h2>
 
-        {projects.map((project) => (
-          <div
-            key={project._id}
-            className="card p-3 mb-3"
-          >
-            <h3>{project.name}</h3>
+        {projects.length === 0 ? (
+          <p>No Projects Found</p>
+        ) : (
+          projects.map((project) => (
+            <div
+              key={project._id}
+              className="card p-3 mb-3"
+            >
+              <h3>{project.name}</h3>
 
-            <p>{project.description}</p>
-          </div>
-        ))}
+              <p>{project.description}</p>
+            </div>
+          ))
+        )}
       </div>
     </>
   );
