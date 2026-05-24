@@ -1,30 +1,30 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const Login = () => {
+const Register = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
       const res = await axios.post(
-        "https://team-task-manager-production-f2ec.up.railway.app/api/auth/login",
+        "https://team-task-manager-production-f2ec.up.railway.app/api/auth/register",
         {
+          name,
           email,
           password,
         }
       );
 
-      alert("Login Successful");
+      alert("Registration Successful");
 
       console.log(res.data);
 
-      localStorage.setItem("token", res.data.token);
-
-      window.location.href = "/dashboard";
+      window.location.href = "/";
     } catch (error) {
       console.log(error);
-      alert("Login Failed");
+      alert("Registration Failed");
     }
   };
 
@@ -48,8 +48,20 @@ const Login = () => {
         }}
       >
         <h1 style={{ textAlign: "center", marginBottom: "20px" }}>
-          Login Page
+          Register Page
         </h1>
+
+        <input
+          type="text"
+          placeholder="Enter Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginBottom: "15px",
+          }}
+        />
 
         <input
           type="email"
@@ -76,27 +88,26 @@ const Login = () => {
         />
 
         <button
-          onClick={handleLogin}
+          onClick={handleRegister}
           style={{
             width: "100%",
             padding: "10px",
-            backgroundColor: "blue",
+            backgroundColor: "green",
             color: "white",
             border: "none",
             cursor: "pointer",
             borderRadius: "5px",
           }}
         >
-          Login
+          Register
         </button>
 
         <p style={{ marginTop: "15px", textAlign: "center" }}>
-          Don't have an account?{" "}
-          <a href="/register">Register</a>
+          Already have an account? <a href="/">Login</a>
         </p>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default Register;
