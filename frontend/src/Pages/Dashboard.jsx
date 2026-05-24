@@ -33,7 +33,7 @@ function Dashboard() {
       };
 
       const { data } = await axios.get(
-        "http://localhost:5000/api/tasks",
+        "http://https://team-task-manager-production-f2ec.up.railway.app/api/tasks",
         config
       );
 
@@ -52,7 +52,7 @@ function Dashboard() {
       };
 
       const { data } = await axios.get(
-        "http://localhost:5000/api/projects",
+        "http://https://team-task-manager-production-f2ec.up.railway.app/api/projects",
         config
       );
 
@@ -75,7 +75,7 @@ function Dashboard() {
       };
 
       await axios.post(
-        "http://localhost:5000/api/tasks",
+        "http://https://team-task-manager-production-f2ec.up.railway.app/api/tasks",
         {
           title,
           description,
@@ -105,7 +105,7 @@ function Dashboard() {
       };
 
       await axios.delete(
-        `http://localhost:5000/api/tasks/${id}`,
+        `http://https://team-task-manager-production-f2ec.up.railway.app/api/tasks/${id}`,
         config
       );
 
@@ -124,7 +124,7 @@ function Dashboard() {
       };
 
       await axios.put(
-        `http://localhost:5000/api/tasks/${id}`,
+        `http://https://team-task-manager-production-f2ec.up.railway.app/api/tasks/${id}`,
         {
           status: "Completed",
         },

@@ -18,7 +18,7 @@ function Projects() {
       };
 
       const { data } = await axios.get(
-        "http://localhost:5000/api/projects",
+        "http://https://team-task-manager-production-f2ec.up.railway.app/api/projects",
         config
       );
 
@@ -37,7 +37,7 @@ function Projects() {
       };
 
       await axios.post(
-        "http://localhost:5000/api/projects",
+        "http://https://team-task-manager-production-f2ec.up.railway.app/api/projects",
         {
           name,
           description,
