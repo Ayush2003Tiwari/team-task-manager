@@ -12,15 +12,12 @@ function Dashboard() {
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
 
-  const [selectedProject, setSelectedProject] =
-    useState("");
+  const [selectedProject, setSelectedProject] = useState("");
 
-  const [filterProject, setFilterProject] =
-    useState("all");
+  const [filterProject, setFilterProject] = useState("all");
 
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
-
     window.location.reload();
   };
 
@@ -33,7 +30,7 @@ function Dashboard() {
       };
 
       const { data } = await axios.get(
-        "http://https://team-task-manager-production-f2ec.up.railway.app/api/tasks",
+        "https://team-task-manager-production-f2ec.up.railway.app/api/tasks",
         config
       );
 
@@ -52,7 +49,7 @@ function Dashboard() {
       };
 
       const { data } = await axios.get(
-        "http://https://team-task-manager-production-f2ec.up.railway.app/api/projects",
+        "https://team-task-manager-production-f2ec.up.railway.app/api/projects",
         config
       );
 
@@ -75,7 +72,7 @@ function Dashboard() {
       };
 
       await axios.post(
-        "http://https://team-task-manager-production-f2ec.up.railway.app/api/tasks",
+        "https://team-task-manager-production-f2ec.up.railway.app/api/tasks",
         {
           title,
           description,
@@ -105,7 +102,7 @@ function Dashboard() {
       };
 
       await axios.delete(
-        `http://https://team-task-manager-production-f2ec.up.railway.app/api/tasks/${id}`,
+        `https://team-task-manager-production-f2ec.up.railway.app/api/tasks/${id}`,
         config
       );
 
@@ -124,7 +121,7 @@ function Dashboard() {
       };
 
       await axios.put(
-        `http://https://team-task-manager-production-f2ec.up.railway.app/api/tasks/${id}`,
+        `https://team-task-manager-production-f2ec.up.railway.app/api/tasks/${id}`,
         {
           status: "Completed",
         },
@@ -150,7 +147,7 @@ function Dashboard() {
         <h1 className="mb-4">Dashboard</h1>
 
         <h2 className="mb-3">
-          Welcome {userInfo.name}
+          Welcome {userInfo?.name}
         </h2>
 
         <button
@@ -170,9 +167,7 @@ function Dashboard() {
             className="form-control mb-3"
             placeholder="Enter Task Title"
             value={title}
-            onChange={(e) =>
-              setTitle(e.target.value)
-            }
+            onChange={(e) => setTitle(e.target.value)}
           />
 
           <input
@@ -180,18 +175,14 @@ function Dashboard() {
             className="form-control mb-3"
             placeholder="Enter Description"
             value={description}
-            onChange={(e) =>
-              setDescription(e.target.value)
-            }
+            onChange={(e) => setDescription(e.target.value)}
           />
 
           <input
             type="date"
             className="form-control mb-3"
             value={dueDate}
-            onChange={(e) =>
-              setDueDate(e.target.value)
-            }
+            onChange={(e) => setDueDate(e.target.value)}
           />
 
           <select
@@ -246,8 +237,7 @@ function Dashboard() {
           .filter((task) =>
             filterProject === "all"
               ? true
-              : task.project?._id ===
-                filterProject
+              : task.project?._id === filterProject
           )
           .map((task) => {
             const overdue =
@@ -288,8 +278,7 @@ function Dashboard() {
                     color:
                       task.status === "Completed"
                         ? "green"
-                        : task.status ===
-                          "In Progress"
+                        : task.status === "In Progress"
                         ? "orange"
                         : "red",
                     fontWeight: "bold",
@@ -302,9 +291,7 @@ function Dashboard() {
                   <button
                     className="btn btn-danger me-2"
                     onClick={() =>
-                      deleteTaskHandler(
-                        task._id
-                      )
+                      deleteTaskHandler(task._id)
                     }
                   >
                     Delete
@@ -313,9 +300,7 @@ function Dashboard() {
                   <button
                     className="btn btn-success"
                     onClick={() =>
-                      completeTaskHandler(
-                        task._id
-                      )
+                      completeTaskHandler(task._id)
                     }
                   >
                     Mark Completed
