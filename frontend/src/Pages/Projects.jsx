@@ -3,7 +3,8 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 
 function Projects() {
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const userInfo =
+    JSON.parse(localStorage.getItem("userInfo")) || {};
 
   const [projects, setProjects] = useState([]);
   const [name, setName] = useState("");
@@ -11,9 +12,11 @@ function Projects() {
 
   const fetchProjects = async () => {
     try {
+      if (!userInfo?.token) return;
+
       const config = {
         headers: {
-          Authorization: `Bearer ${userInfo.token}`,
+          Authorization: `Bearer ${userInfo?.token}`,
         },
       };
 
@@ -30,9 +33,19 @@ function Projects() {
 
   const createProjectHandler = async () => {
     try {
+      if (!userInfo?.token) {
+        alert("Please login again");
+        return;
+      }
+
+      if (!name || !description) {
+        alert("Please fill all fields");
+        return;
+      }
+
       const config = {
         headers: {
-          Authorization: `Bearer ${userInfo.token}`,
+          Authorization: `Bearer ${userInfo?.token}`,
         },
       };
 
@@ -44,6 +57,8 @@ function Projects() {
         },
         config
       );
+
+      alert("Project Created Successfully");
 
       fetchProjects();
 
@@ -67,14 +82,18 @@ function Projects() {
         <h1 className="mb-4">Projects</h1>
 
         <div className="card p-4 mb-4">
-          <h3 className="mb-3">Create Project</h3>
+          <h3 className="mb-3">
+            Create Project
+          </h3>
 
           <input
             type="text"
             className="form-control mb-3"
             placeholder="Enter Project Name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) =>
+              setName(e.target.value)
+            }
           />
 
           <input

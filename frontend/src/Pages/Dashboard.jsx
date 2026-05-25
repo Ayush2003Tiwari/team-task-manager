@@ -3,7 +3,8 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 
 function Dashboard() {
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const userInfo =
+    JSON.parse(localStorage.getItem("userInfo")) || {};
 
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -12,20 +13,24 @@ function Dashboard() {
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
 
-  const [selectedProject, setSelectedProject] = useState("");
+  const [selectedProject, setSelectedProject] =
+    useState("");
 
-  const [filterProject, setFilterProject] = useState("all");
+  const [filterProject, setFilterProject] =
+    useState("all");
 
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
-    window.location.reload();
+    window.location.href = "/";
   };
 
   const fetchTasks = async () => {
     try {
+      if (!userInfo?.token) return;
+
       const config = {
         headers: {
-          Authorization: `Bearer ${userInfo.token}`,
+          Authorization: `Bearer ${userInfo?.token}`,
         },
       };
 
@@ -42,9 +47,11 @@ function Dashboard() {
 
   const fetchProjects = async () => {
     try {
+      if (!userInfo?.token) return;
+
       const config = {
         headers: {
-          Authorization: `Bearer ${userInfo.token}`,
+          Authorization: `Bearer ${userInfo?.token}`,
         },
       };
 
@@ -65,9 +72,14 @@ function Dashboard() {
 
   const createTaskHandler = async () => {
     try {
+      if (!userInfo?.token) {
+        alert("Please login again");
+        return;
+      }
+
       const config = {
         headers: {
-          Authorization: `Bearer ${userInfo.token}`,
+          Authorization: `Bearer ${userInfo?.token}`,
         },
       };
 
@@ -78,10 +90,11 @@ function Dashboard() {
           description,
           dueDate,
           project: selectedProject,
-          assignedTo: userInfo._id,
         },
         config
       );
+
+      alert("Task Created Successfully");
 
       fetchTasks();
 
@@ -90,6 +103,7 @@ function Dashboard() {
       setDueDate("");
     } catch (error) {
       console.log(error);
+      alert("Task Creation Failed");
     }
   };
 
@@ -97,7 +111,7 @@ function Dashboard() {
     try {
       const config = {
         headers: {
-          Authorization: `Bearer ${userInfo.token}`,
+          Authorization: `Bearer ${userInfo?.token}`,
         },
       };
 
@@ -116,7 +130,7 @@ function Dashboard() {
     try {
       const config = {
         headers: {
-          Authorization: `Bearer ${userInfo.token}`,
+          Authorization: `Bearer ${userInfo?.token}`,
         },
       };
 
@@ -147,7 +161,7 @@ function Dashboard() {
         <h1 className="mb-4">Dashboard</h1>
 
         <h2 className="mb-3">
-          Welcome {userInfo?.name}
+          Welcome {userInfo?.name || "User"}
         </h2>
 
         <button
@@ -175,7 +189,9 @@ function Dashboard() {
             className="form-control mb-3"
             placeholder="Enter Description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) =>
+              setDescription(e.target.value)
+            }
           />
 
           <input
@@ -192,6 +208,10 @@ function Dashboard() {
               setSelectedProject(e.target.value)
             }
           >
+            <option value="">
+              Select Project
+            </option>
+
             {projects.map((project) => (
               <option
                 key={project._id}
@@ -237,7 +257,8 @@ function Dashboard() {
           .filter((task) =>
             filterProject === "all"
               ? true
-              : task.project?._id === filterProject
+              : task.project?._id ===
+                filterProject
           )
           .map((task) => {
             const overdue =
@@ -278,7 +299,8 @@ function Dashboard() {
                     color:
                       task.status === "Completed"
                         ? "green"
-                        : task.status === "In Progress"
+                        : task.status ===
+                          "In Progress"
                         ? "orange"
                         : "red",
                     fontWeight: "bold",
@@ -291,7 +313,9 @@ function Dashboard() {
                   <button
                     className="btn btn-danger me-2"
                     onClick={() =>
-                      deleteTaskHandler(task._id)
+                      deleteTaskHandler(
+                        task._id
+                      )
                     }
                   >
                     Delete
@@ -300,7 +324,9 @@ function Dashboard() {
                   <button
                     className="btn btn-success"
                     onClick={() =>
-                      completeTaskHandler(task._id)
+                      completeTaskHandler(
+                        task._id
+                      )
                     }
                   >
                     Mark Completed
