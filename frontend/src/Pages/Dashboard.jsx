@@ -3,10 +3,6 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 
 function Dashboard() {
-  const userInfo = JSON.parse(
-    localStorage.getItem("userInfo")
-  );
-
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
 
@@ -19,50 +15,35 @@ function Dashboard() {
     useState("");
 
   useEffect(() => {
-    if (!userInfo) {
-      window.location.href = "/login";
-      return;
-    }
-
     fetchProjects();
     fetchTasks();
   }, []);
 
   const fetchProjects = async () => {
     try {
-      const { data } = await axios.get(
+      const res = await axios.get(
         "https://team-task-manager-production-f2ec.up.railway.app/api/projects"
       );
 
-      setProjects(data);
-    } catch (error) {
-      console.log(error);
+      setProjects(res.data);
+    } catch (err) {
+      console.log(err);
     }
   };
 
   const fetchTasks = async () => {
     try {
-      const { data } = await axios.get(
+      const res = await axios.get(
         "https://team-task-manager-production-f2ec.up.railway.app/api/tasks"
       );
 
-      setTasks(data);
-    } catch (error) {
-      console.log(error);
+      setTasks(res.data);
+    } catch (err) {
+      console.log(err);
     }
   };
 
   const createTaskHandler = async () => {
-    if (
-      !title ||
-      !description ||
-      !dueDate ||
-      !projectId
-    ) {
-      alert("Please fill all fields");
-      return;
-    }
-
     try {
       await axios.post(
         "https://team-task-manager-production-f2ec.up.railway.app/api/tasks",
@@ -74,7 +55,7 @@ function Dashboard() {
         }
       );
 
-      alert("Task Created Successfully");
+      alert("Task Created");
 
       setTitle("");
       setDescription("");
@@ -82,15 +63,15 @@ function Dashboard() {
       setProjectId("");
 
       fetchTasks();
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
       alert("Task creation failed");
     }
   };
 
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   return (
@@ -100,10 +81,6 @@ function Dashboard() {
       <div className="container mt-4">
         <h1>Dashboard</h1>
 
-        <h2 className="mt-4">
-          Welcome User
-        </h2>
-
         <button
           className="btn btn-danger mb-4"
           onClick={logoutHandler}
@@ -111,15 +88,13 @@ function Dashboard() {
           Logout
         </button>
 
-        <hr />
-
         <div className="card p-4 mb-4">
-          <h2>Create Task</h2>
+          <h3>Create Task</h3>
 
           <input
             type="text"
             className="form-control mb-3"
-            placeholder="Enter Task Title"
+            placeholder="Task Title"
             value={title}
             onChange={(e) =>
               setTitle(e.target.value)
@@ -129,7 +104,7 @@ function Dashboard() {
           <input
             type="text"
             className="form-control mb-3"
-            placeholder="Enter Description"
+            placeholder="Description"
             value={description}
             onChange={(e) =>
               setDescription(
@@ -178,32 +153,18 @@ function Dashboard() {
 
         <h2>Your Tasks</h2>
 
-        {tasks.length === 0 ? (
-          <p>No Tasks Found</p>
-        ) : (
-          tasks.map((task) => (
-            <div
-              key={task._id}
-              className="card p-3 mb-3"
-            >
-              <h3>{task.title}</h3>
+        {tasks.map((task) => (
+          <div
+            key={task._id}
+            className="card p-3 mb-3"
+          >
+            <h4>{task.title}</h4>
 
-              <p>{task.description}</p>
+            <p>{task.description}</p>
 
-              <p>
-                <strong>Status:</strong>{" "}
-                {task.status}
-              </p>
-
-              <p>
-                <strong>Due:</strong>{" "}
-                {new Date(
-                  task.dueDate
-                ).toLocaleDateString()}
-              </p>
-            </div>
-          ))
-        )}
+            <p>Status: {task.status}</p>
+          </div>
+        ))}
       </div>
     </>
   );
