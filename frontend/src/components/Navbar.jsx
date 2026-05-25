@@ -2,30 +2,28 @@ import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
-    <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
-      <div className="container">
+    <nav className="navbar navbar-dark bg-dark px-4">
+      <Link
+        to="/dashboard"
+        className="navbar-brand"
+      >
+        Team Task Manager
+      </Link>
+
+      <div>
         <Link
-          className="navbar-brand"
           to="/dashboard"
+          className="btn btn-outline-light me-2"
         >
-          Team Task Manager
+          Dashboard
         </Link>
 
-        <div>
-          <Link
-            className="btn btn-outline-light me-2"
-            to="/dashboard"
-          >
-            Dashboard
-          </Link>
-
-          <Link
-            className="btn btn-outline-light"
-            to="/projects"
-          >
-            Projects
-          </Link>
-        </div>
+        <Link
+          to="/projects"
+          className="btn btn-outline-light"
+        >
+          Projects
+        </Link>
       </div>
     </nav>
   );
