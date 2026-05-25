@@ -1,28 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { useNavigate } from "react-router-dom";
 
 function Projects() {
-  const navigate = useNavigate();
-
-  const userInfo = JSON.parse(
-    localStorage.getItem("userInfo")
-  );
-
   const [projects, setProjects] = useState([]);
   const [name, setName] = useState("");
   const [description, setDescription] =
     useState("");
-
-  useEffect(() => {
-    if (!userInfo) {
-      navigate("/");
-      return;
-    }
-
-    fetchProjects();
-  }, []);
 
   const fetchProjects = async () => {
     try {
@@ -51,7 +35,7 @@ function Projects() {
         }
       );
 
-      alert("Project Created");
+      alert("Project Created Successfully");
 
       setName("");
       setDescription("");
@@ -62,6 +46,10 @@ function Projects() {
       alert("Project creation failed");
     }
   };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   return (
     <>
