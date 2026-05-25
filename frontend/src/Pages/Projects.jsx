@@ -1,28 +1,33 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
 
 function Projects() {
-  const userInfo =
-    JSON.parse(localStorage.getItem("userInfo")) || {};
+  const navigate = useNavigate();
+
+  const userInfo = JSON.parse(
+    localStorage.getItem("userInfo")
+  );
 
   const [projects, setProjects] = useState([]);
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] =
+    useState("");
+
+  useEffect(() => {
+    if (!userInfo) {
+      navigate("/");
+      return;
+    }
+
+    fetchProjects();
+  }, []);
 
   const fetchProjects = async () => {
     try {
-      if (!userInfo?.token) return;
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${userInfo?.token}`,
-        },
-      };
-
       const { data } = await axios.get(
-        "https://team-task-manager-production-f2ec.up.railway.app/api/projects",
-        config
+        "https://team-task-manager-production-f2ec.up.railway.app/api/projects"
       );
 
       setProjects(data);
@@ -32,47 +37,31 @@ function Projects() {
   };
 
   const createProjectHandler = async () => {
+    if (!name || !description) {
+      alert("Please fill all fields");
+      return;
+    }
+
     try {
-      if (!userInfo?.token) {
-        alert("Please login again");
-        return;
-      }
-
-      if (!name || !description) {
-        alert("Please fill all fields");
-        return;
-      }
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${userInfo?.token}`,
-        },
-      };
-
       await axios.post(
         "https://team-task-manager-production-f2ec.up.railway.app/api/projects",
         {
           name,
           description,
-        },
-        config
+        }
       );
 
-      alert("Project Created Successfully");
-
-      fetchProjects();
+      alert("Project Created");
 
       setName("");
       setDescription("");
+
+      fetchProjects();
     } catch (error) {
       console.log(error);
-      alert("Project Creation Failed");
+      alert("Project creation failed");
     }
   };
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
 
   return (
     <>
