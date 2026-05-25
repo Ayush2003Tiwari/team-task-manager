@@ -3,40 +3,47 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 
 function Dashboard() {
-  const userInfo =
-    JSON.parse(localStorage.getItem("userInfo")) || {};
+  const userInfo = JSON.parse(
+    localStorage.getItem("userInfo")
+  );
 
-  const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState("");
-
-  const [selectedProject, setSelectedProject] =
+  const [description, setDescription] =
+    useState("");
+  const [dueDate, setDueDate] =
+    useState("");
+  const [projectId, setProjectId] =
     useState("");
 
-  const [filterProject, setFilterProject] =
-    useState("all");
+  useEffect(() => {
+    if (!userInfo) {
+      window.location.href = "/login";
+      return;
+    }
 
-  const logoutHandler = () => {
-    localStorage.removeItem("userInfo");
-    window.location.href = "/";
+    fetchProjects();
+    fetchTasks();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const { data } = await axios.get(
+        "https://team-task-manager-production-f2ec.up.railway.app/api/projects"
+      );
+
+      setProjects(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const fetchTasks = async () => {
     try {
-      if (!userInfo?.token) return;
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${userInfo?.token}`,
-        },
-      };
-
       const { data } = await axios.get(
-        "https://team-task-manager-production-f2ec.up.railway.app/api/tasks",
-        config
+        "https://team-task-manager-production-f2ec.up.railway.app/api/tasks"
       );
 
       setTasks(data);
@@ -45,123 +52,56 @@ function Dashboard() {
     }
   };
 
-  const fetchProjects = async () => {
-    try {
-      if (!userInfo?.token) return;
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${userInfo?.token}`,
-        },
-      };
-
-      const { data } = await axios.get(
-        "https://team-task-manager-production-f2ec.up.railway.app/api/projects",
-        config
-      );
-
-      setProjects(data);
-
-      if (data.length > 0) {
-        setSelectedProject(data[0]._id);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const createTaskHandler = async () => {
+    if (
+      !title ||
+      !description ||
+      !dueDate ||
+      !projectId
+    ) {
+      alert("Please fill all fields");
+      return;
+    }
+
     try {
-      if (!userInfo?.token) {
-        alert("Please login again");
-        return;
-      }
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${userInfo?.token}`,
-        },
-      };
-
       await axios.post(
         "https://team-task-manager-production-f2ec.up.railway.app/api/tasks",
         {
           title,
           description,
           dueDate,
-          project: selectedProject,
-        },
-        config
+          project: projectId,
+        }
       );
 
       alert("Task Created Successfully");
 
-      fetchTasks();
-
       setTitle("");
       setDescription("");
       setDueDate("");
-    } catch (error) {
-      console.log(error);
-      alert("Task Creation Failed");
-    }
-  };
-
-  const deleteTaskHandler = async (id) => {
-    try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${userInfo?.token}`,
-        },
-      };
-
-      await axios.delete(
-        `https://team-task-manager-production-f2ec.up.railway.app/api/tasks/${id}`,
-        config
-      );
-
-      setTasks(tasks.filter((task) => task._id !== id));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const completeTaskHandler = async (id) => {
-    try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${userInfo?.token}`,
-        },
-      };
-
-      await axios.put(
-        `https://team-task-manager-production-f2ec.up.railway.app/api/tasks/${id}`,
-        {
-          status: "Completed",
-        },
-        config
-      );
+      setProjectId("");
 
       fetchTasks();
     } catch (error) {
       console.log(error);
+      alert("Task creation failed");
     }
   };
 
-  useEffect(() => {
-    fetchTasks();
-    fetchProjects();
-  }, []);
+  const logoutHandler = () => {
+    localStorage.removeItem("userInfo");
+    window.location.href = "/login";
+  };
 
   return (
     <>
       <Navbar />
 
       <div className="container mt-4">
-        <h1 className="mb-4">Dashboard</h1>
+        <h1>Dashboard</h1>
 
-        <h2 className="mb-3">
-          Welcome {userInfo?.name || "User"}
+        <h2 className="mt-4">
+          Welcome User
         </h2>
 
         <button
@@ -174,14 +114,16 @@ function Dashboard() {
         <hr />
 
         <div className="card p-4 mb-4">
-          <h3 className="mb-3">Create Task</h3>
+          <h2>Create Task</h2>
 
           <input
             type="text"
             className="form-control mb-3"
             placeholder="Enter Task Title"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) =>
+              setTitle(e.target.value)
+            }
           />
 
           <input
@@ -190,7 +132,9 @@ function Dashboard() {
             placeholder="Enter Description"
             value={description}
             onChange={(e) =>
-              setDescription(e.target.value)
+              setDescription(
+                e.target.value
+              )
             }
           />
 
@@ -198,14 +142,16 @@ function Dashboard() {
             type="date"
             className="form-control mb-3"
             value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
+            onChange={(e) =>
+              setDueDate(e.target.value)
+            }
           />
 
           <select
             className="form-control mb-3"
-            value={selectedProject}
+            value={projectId}
             onChange={(e) =>
-              setSelectedProject(e.target.value)
+              setProjectId(e.target.value)
             }
           >
             <option value="">
@@ -230,111 +176,34 @@ function Dashboard() {
           </button>
         </div>
 
-        <h2 className="mb-3">Your Tasks</h2>
+        <h2>Your Tasks</h2>
 
-        <select
-          className="form-control mb-4"
-          value={filterProject}
-          onChange={(e) =>
-            setFilterProject(e.target.value)
-          }
-        >
-          <option value="all">
-            All Projects
-          </option>
-
-          {projects.map((project) => (
-            <option
-              key={project._id}
-              value={project._id}
+        {tasks.length === 0 ? (
+          <p>No Tasks Found</p>
+        ) : (
+          tasks.map((task) => (
+            <div
+              key={task._id}
+              className="card p-3 mb-3"
             >
-              {project.name}
-            </option>
-          ))}
-        </select>
+              <h3>{task.title}</h3>
 
-        {tasks
-          .filter((task) =>
-            filterProject === "all"
-              ? true
-              : task.project?._id ===
-                filterProject
-          )
-          .map((task) => {
-            const overdue =
-              new Date(task.dueDate) < new Date() &&
-              task.status !== "Completed";
+              <p>{task.description}</p>
 
-            return (
-              <div
-                key={task._id}
-                className="card p-3 mb-3"
-              >
-                <h3>{task.title}</h3>
+              <p>
+                <strong>Status:</strong>{" "}
+                {task.status}
+              </p>
 
-                <p>{task.description}</p>
-
-                <p>
-                  <strong>Project:</strong>{" "}
-                  {task.project?.name}
-                </p>
-
-                <p>
-                  <strong>Due Date:</strong>{" "}
-                  {task.dueDate
-                    ? new Date(
-                        task.dueDate
-                      ).toLocaleDateString()
-                    : "No Date"}
-                </p>
-
-                {overdue && (
-                  <p style={{ color: "red" }}>
-                    ⚠ Overdue Task
-                  </p>
-                )}
-
-                <p
-                  style={{
-                    color:
-                      task.status === "Completed"
-                        ? "green"
-                        : task.status ===
-                          "In Progress"
-                        ? "orange"
-                        : "red",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Status: {task.status}
-                </p>
-
-                <div>
-                  <button
-                    className="btn btn-danger me-2"
-                    onClick={() =>
-                      deleteTaskHandler(
-                        task._id
-                      )
-                    }
-                  >
-                    Delete
-                  </button>
-
-                  <button
-                    className="btn btn-success"
-                    onClick={() =>
-                      completeTaskHandler(
-                        task._id
-                      )
-                    }
-                  >
-                    Mark Completed
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+              <p>
+                <strong>Due:</strong>{" "}
+                {new Date(
+                  task.dueDate
+                ).toLocaleDateString()}
+              </p>
+            </div>
+          ))
+        )}
       </div>
     </>
   );
