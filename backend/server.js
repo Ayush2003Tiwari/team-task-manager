@@ -18,10 +18,14 @@ app.use(express.json());
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log(err));
+  .then(() => {
+    console.log("MongoDB Connected");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
-// ---------------- MODELS ----------------
+// ================= MODELS =================
 
 const userSchema = mongoose.Schema({
   name: String,
@@ -54,17 +58,19 @@ const taskSchema = mongoose.Schema({
 
 const Task = mongoose.model("Task", taskSchema);
 
-// ---------------- AUTH ----------------
+// ================= AUTH ROUTES =================
 
+// REGISTER
 app.post("/api/auth/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({
+      email,
+    });
 
     if (userExists) {
-      return res.json({
-        success: false,
+      return res.status(400).json({
         message: "User already exists",
       });
     }
@@ -76,17 +82,21 @@ app.post("/api/auth/register", async (req, res) => {
     });
 
     res.json({
-      success: true,
-      user,
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      token: "sampletoken",
     });
   } catch (error) {
     console.log(error);
+
     res.status(500).json({
-      message: "Register Failed",
+      message: "Registration Failed",
     });
   }
 });
 
+// LOGIN
 app.post("/api/auth/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -110,11 +120,16 @@ app.post("/api/auth/login", async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+
+    res.status(500).json({
+      message: "Login Failed",
+    });
   }
 });
 
-// ---------------- PROJECTS ----------------
+// ================= PROJECT ROUTES =================
 
+// GET PROJECTS
 app.get("/api/projects", async (req, res) => {
   try {
     const projects = await Project.find();
@@ -125,6 +140,7 @@ app.get("/api/projects", async (req, res) => {
   }
 });
 
+// CREATE PROJECT
 app.post("/api/projects", async (req, res) => {
   try {
     const { name, description } = req.body;
@@ -137,11 +153,16 @@ app.post("/api/projects", async (req, res) => {
     res.json(project);
   } catch (error) {
     console.log(error);
+
+    res.status(500).json({
+      message: "Project Creation Failed",
+    });
   }
 });
 
-// ---------------- TASKS ----------------
+// ================= TASK ROUTES =================
 
+// GET TASKS
 app.get("/api/tasks", async (req, res) => {
   try {
     const tasks = await Task.find().populate(
@@ -154,6 +175,7 @@ app.get("/api/tasks", async (req, res) => {
   }
 });
 
+// CREATE TASK
 app.post("/api/tasks", async (req, res) => {
   try {
     const {
@@ -173,9 +195,14 @@ app.post("/api/tasks", async (req, res) => {
     res.json(task);
   } catch (error) {
     console.log(error);
+
+    res.status(500).json({
+      message: "Task Creation Failed",
+    });
   }
 });
 
+// UPDATE TASK
 app.put("/api/tasks/:id", async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
@@ -192,6 +219,7 @@ app.put("/api/tasks/:id", async (req, res) => {
   }
 });
 
+// DELETE TASK
 app.delete("/api/tasks/:id", async (req, res) => {
   try {
     await Task.findByIdAndDelete(req.params.id);
@@ -204,16 +232,14 @@ app.delete("/api/tasks/:id", async (req, res) => {
   }
 });
 
-// ---------------- ROOT ----------------
-
+// ROOT
 app.get("/", (req, res) => {
   res.send("API Running");
 });
 
-// ---------------- SERVER ----------------
-
+// SERVER
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
